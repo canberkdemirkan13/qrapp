@@ -298,7 +298,10 @@
         <div id="attendanceView" class="hidden">
             <div class="header">
                 <h1>📊 Yoklama Tablosu</h1>
-                <button class="btn" onclick="backToTeacher()">← Ana Sayfa</button>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn" onclick="refreshAttendance()" style="background: #28a745;">🔄 Yenile</button>
+                    <button class="btn" onclick="backToTeacher()">← Ana Sayfa</button>
+                </div>
             </div>
             <div class="table-container">
                 <table id="attendanceTable"></table>
@@ -476,6 +479,7 @@
             }
             
             attendance[studentNo][currentWeek - 1] = true;
+            saveAttendance();
             messageDiv.innerHTML = `<div class="message success">✅ Yoklama başarılı! ${student.name} - Hafta ${currentWeek}</div>`;
             
             setTimeout(() => {
