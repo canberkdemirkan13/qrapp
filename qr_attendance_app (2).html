@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Kodlu Yoklama Sistemi</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 2em;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .qr-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .qr-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        
+        .qr-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .qr-code {
+            margin: 15px auto;
+            padding: 10px;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .student-form {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 500px;
+            margin: 50px auto;
+        }
+        
+        .student-form h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+        
+        .message.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffeaa7;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            overflow-x: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        
+        th, td {
+            padding: 12px 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+        }
+        
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            font-size: 12px;
+        }
+        
+        .status-pass {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .info-box {
+            background: white;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .info-box ul {
+            margin-left: 20px;
+        }
+        
+        .info-box li {
+            margin: 8px 0;
+            color: #333;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .check-icon {
+            color: #28a745;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .x-icon {
+            color: #dc3545;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+            .qr-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="teacherView">
+            <div class="header">
+                <h1>📱 QR Kodlu Yoklama Sistemi</h1>
+                <button class="btn" onclick="showAttendanceTable()">📊 Yoklama Tablosu</button>
+            </div>
+            
+            <div class="qr-grid" id="qrGrid"></div>
+            
+            <div class="info-box">
+                <h3>📋 Kullanım Talimatları</h3>
+                <ul>
+                    <li>Öğrenciler QR kodu telefon kamerasıyla taratarak yoklama verebilir</li>
+                    <li>Açılan sayfada öğrenci numaralarını girecekler</li>
+                    <li>%70 devam zorunluluğu var (14 haftanın en az 10'u)</li>
+                    <li>5 veya daha fazla devamsızlık yapan öğrenci dersten kalacak</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="studentView" class="hidden">
+            <div class="student-form">
+                <button class="btn" onclick="backToTeacher()" style="margin-bottom: 20px;">← Geri Dön</button>
+                <h2>🎓 Hafta <span id="weekNumber"></span> Yoklama</h2>
+                <div class="form-group">
+                    <label>Öğrenci Numaranız:</label>
+                    <input type="text" id="studentNo" placeholder="Örn: 18070003013" maxlength="11">
+                </div>
+                <button class="btn" onclick="submitAttendance()" style="width: 100%;">Yoklama Ver</button>
+                <div id="message"></div>
+            </div>
+        </div>
+        
+        <div id="attendanceView" class="hidden">
+            <div class="header">
+                <h1>📊 Yoklama Tablosu</h1>
+                <button class="btn" onclick="backToTeacher()">← Ana Sayfa</button>
+            </div>
+            <div class="table-container">
+                <table id="attendanceTable"></table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const students = [
+            { no: "21070001051", name: "ARDA ALTUNHAN", dept: "BİLGİSAYAR MÜHENDİSLİĞİ" },
+            { no: "21070007004", name: "EKİN ALTUNKAYA", dept: "ENERJİ SİSTEMLERİ MÜHENDİSLİĞİ" },
+            { no: "20070008017", name: "ÖMER ARICA", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "21070005042", name: "ZEYNEP ARSLANBUĞA", dept: "ELEKTRİK-ELEKTRONİK MÜHENDİSLİĞİ" },
+            { no: "20070002048", name: "İPEK ATIŞ", dept: "ENDÜSTRİ MÜHENDİSLİĞİ" },
+            { no: "21070008206", name: "DEMET BÜYÜKTAŞ", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "22070008017", name: "EDA NUR ÇALIŞKAN", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "20070007004", name: "İDİL ECE CEVAHİR", dept: "ENERJİ SİSTEMLERİ MÜHENDİSLİĞİ" },
+            { no: "21070008014", name: "İSMAİL CANBERK DEMİRKAN", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "21070001031", name: "ÜTKU DERİCİ", dept: "BİLGİSAYAR MÜHENDİSLİĞİ" },
+            { no: "21070008034", name: "ATAKAN DİNÇER", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "21070005027", name: "KIVANÇ EFE ERGÖNÜL", dept: "ELEKTRİK-ELEKTRONİK MÜHENDİSLİĞİ" },
+            { no: "21070008009", name: "EMRE ERİŞİR", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "22070001041", name: "GÜRKAN EROĞLU", dept: "BİLGİSAYAR MÜHENDİSLİĞİ" },
+            { no: "21070008017", name: "KEREM EROĞLU", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "21070008016", name: "CAN GİRGİN", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "18070003013", name: "İBRAHİM GÜLTEKİN", dept: "İNŞAAT MÜHENDİSLİĞİ" },
+            { no: "19070001053", name: "ELİF ENHME GÜNAL", dept: "BİLGİSAYAR MÜHENDİSLİĞİ" },
+            { no: "22070002047", name: "KADİR EMRE GÜNEŞ", dept: "ENDÜSTRİ MÜHENDİSLİĞİ" },
+            { no: "20070008029", name: "BERİL DERAN GÜRBÜZ", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "22070005053", name: "EMRE CAN HEKİMOĞLU", dept: "ELEKTRİK-ELEKTRONİK MÜHENDİSLİĞİ" },
+            { no: "22070008034", name: "AYKAN KANLI", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "22070008043", name: "DENİZ KARATEPE", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "22070003022", name: "AYŞEGÜL KARINYARICI", dept: "İNŞAAT MÜHENDİSLİĞİ" },
+            { no: "20070008019", name: "SELİM MERT KIRCALİLİ", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "21070001046", name: "AHMET ÖZGÜR KORKMAZ", dept: "BİLGİSAYAR MÜHENDİSLİĞİ" },
+            { no: "21070005030", name: "OĞUZ KOYUCAN", dept: "ELEKTRİK-ELEKTRONİK MÜHENDİSLİĞİ" },
+            { no: "21070008033", name: "ALP SERKAN MERKİT", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "20070008016", name: "SUDE ONFİDAN", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "20070001057", name: "ERCE ÖZKAN", dept: "BİLGİSAYAR MÜHENDİSLİĞİ" },
+            { no: "22070008021", name: "SAMİ BERK ŞAHİN", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "22070002015", name: "SÜLEYMAN BATU SARI", dept: "ENDÜSTRİ MÜHENDİSLİĞİ" },
+            { no: "22070007014", name: "ILGAR SENOL", dept: "ENERJİ SİSTEMLERİ MÜHENDİSLİĞİ" },
+            { no: "21070002005", name: "NESRİN ŞENTÜRK", dept: "ENDÜSTRİ MÜHENDİSLİĞİ" },
+            { no: "21070001004", name: "ALİ HAKTAN SİĞİN", dept: "BİLGİSAYAR MÜHENDİSLİĞİ" },
+            { no: "21070002025", name: "BATUHAN ŞİŞMAN", dept: "ENDÜSTRİ MÜHENDİSLİĞİ" },
+            { no: "21070008027", name: "ARMAĞAN SOYLU", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "21070007001", name: "BESTE TEKİN", dept: "ENERJİ SİSTEMLERİ MÜHENDİSLİĞİ" },
+            { no: "21070001070", name: "EKREM TEMEL", dept: "BİLGİSAYAR MÜHENDİSLİĞİ" },
+            { no: "22070005040", name: "TOPRAK TUNCER", dept: "ELEKTRİK-ELEKTRONİK MÜHENDİSLİĞİ" },
+            { no: "22070008026", name: "DENİZ ÜNVER", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "19070008012", name: "ERK YANKI URAL", dept: "MAKİNE MÜHENDİSLİĞİ" },
+            { no: "22070001055", name: "EMRE EFE YÜKSEL", dept: "BİLGİSAYAR MÜHENDİSLİĞİ" }
+        ];
+
+        let attendance = {};
+        let currentWeek = null;
+        let baseURL = '';
+
+        function initAttendance() {
+            students.forEach(student => {
+                attendance[student.no] = Array(14).fill(false);
+            });
+            
+            // LocalStorage'dan verileri yükle
+            const saved = localStorage.getItem('attendanceData');
+            if (saved) {
+                try {
+                    const savedData = JSON.parse(saved);
+                    // Mevcut öğrenci numaralarıyla birleştir
+                    students.forEach(student => {
+                        if (savedData[student.no]) {
+                            attendance[student.no] = savedData[student.no];
+                        }
+                    });
+                } catch (e) {
+                    console.error('Veri yükleme hatası:', e);
+                }
+            }
+        }
+
+        function saveAttendance() {
+            try {
+                localStorage.setItem('attendanceData', JSON.stringify(attendance));
+            } catch (e) {
+                console.error('Veri kaydetme hatası:', e);
+            }
+        }
+
+        function refreshAttendance() {
+            initAttendance();
+            showAttendanceTable();
+        }
+
+        function getBaseURL() {
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                return window.location.origin + window.location.pathname;
+            }
+            return window.location.origin + window.location.pathname;
+        }
+
+        function generateQRCodes() {
+            baseURL = getBaseURL();
+            const grid = document.getElementById('qrGrid');
+            grid.innerHTML = '';
+            
+            for (let i = 1; i <= 14; i++) {
+                const card = document.createElement('div');
+                card.className = 'qr-card';
+                card.onclick = () => showStudentForm(i);
+                
+                const title = document.createElement('h3');
+                title.textContent = `Hafta ${i}`;
+                card.appendChild(title);
+                
+                const qrDiv = document.createElement('div');
+                qrDiv.className = 'qr-code';
+                qrDiv.id = `qr${i}`;
+                card.appendChild(qrDiv);
+                
+                const info = document.createElement('p');
+                info.textContent = 'Telefonla Tarayın';
+                info.style.color = '#666';
+                info.style.marginTop = '10px';
+                card.appendChild(info);
+                
+                grid.appendChild(card);
+                
+                const qrURL = `${baseURL}?hafta=${i}`;
+                
+                setTimeout(() => {
+                    new QRCode(document.getElementById(`qr${i}`), {
+                        text: qrURL,
+                        width: 150,
+                        height: 150
+                    });
+                }, 100 * i);
+            }
+        }
+
+        function showStudentForm(week) {
+            currentWeek = week;
+            document.getElementById('teacherView').classList.add('hidden');
+            document.getElementById('studentView').classList.remove('hidden');
+            document.getElementById('weekNumber').textContent = week;
+            document.getElementById('studentNo').value = '';
+            document.getElementById('message').innerHTML = '';
+            document.getElementById('studentNo').focus();
+        }
+
+        function backToTeacher() {
+            document.getElementById('teacherView').classList.remove('hidden');
+            document.getElementById('studentView').classList.add('hidden');
+            document.getElementById('attendanceView').classList.add('hidden');
+            currentWeek = null;
+        }
+
+        function submitAttendance() {
+            const studentNo = document.getElementById('studentNo').value.trim();
+            const messageDiv = document.getElementById('message');
+            
+            if (!studentNo) {
+                messageDiv.innerHTML = '<div class="message error">❌ Lütfen öğrenci numaranızı giriniz!</div>';
+                return;
+            }
+            
+            const student = students.find(s => s.no === studentNo);
+            if (!student) {
+                messageDiv.innerHTML = '<div class="message error">❌ Öğrenci bulunamadı! Numaranızı kontrol edin.</div>';
+                return;
+            }
+            
+            if (attendance[studentNo][currentWeek - 1]) {
+                messageDiv.innerHTML = '<div class="message warning">⚠️ Bu hafta için zaten yoklama verilmiş!</div>';
+                return;
+            }
+            
+            attendance[studentNo][currentWeek - 1] = true;
+            messageDiv.innerHTML = `<div class="message success">✅ Yoklama başarılı! ${student.name} - Hafta ${currentWeek}</div>`;
+            
+            setTimeout(() => {
+                backToTeacher();
+            }, 2000);
+        }
+
+        function showAttendanceTable() {
+            document.getElementById('teacherView').classList.add('hidden');
+            document.getElementById('attendanceView').classList.remove('hidden');
+            
+            const table = document.getElementById('attendanceTable');
+            let html = '<thead><tr><th style="min-width: 40px;">No</th><th style="min-width: 120px;">Öğrenci No</th><th style="min-width: 180px;">Ad Soyad</th><th style="min-width: 120px;">Bölüm</th>';
+            
+            for (let i = 1; i <= 14; i++) {
+                html += `<th style="min-width: 35px;">H${i}</th>`;
+            }
+            html += '<th style="min-width: 60px;">Toplam</th><th style="min-width: 50px;">%</th><th style="min-width: 80px;">Durum</th></tr></thead><tbody>';
+            
+            students.forEach((student, idx) => {
+                const attendanceCount = attendance[student.no].filter(Boolean).length;
+                const percentage = (attendanceCount / 14 * 100).toFixed(0);
+                const status = percentage >= 70 ? 'GEÇTİ' : 'KALDI';
+                const statusClass = status === 'GEÇTİ' ? 'status-pass' : 'status-fail';
+                
+                html += `<tr><td>${idx + 1}</td><td>${student.no}</td><td style="text-align: left; padding-left: 10px;">${student.name}</td><td>${student.dept}</td>`;
+                
+                for (let i = 0; i < 14; i++) {
+                    if (attendance[student.no][i]) {
+                        html += '<td class="check-icon">✓</td>';
+                    } else {
+                        html += '<td class="x-icon">✗</td>';
+                    }
+                }
+                
+                html += `<td><strong>${attendanceCount}/14</strong></td>`;
+                html += `<td><strong>${percentage}%</strong></td>`;
+                html += `<td><span class="status-badge ${statusClass}">${status}</span></td></tr>`;
+            });
+            
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+
+        document.getElementById('studentNo').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitAttendance();
+            }
+        });
+
+        window.addEventListener('load', function() {
+            initAttendance();
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const hafta = urlParams.get('hafta');
+            
+            if (hafta && hafta >= 1 && hafta <= 14) {
+                showStudentForm(parseInt(hafta));
+            } else {
+                generateQRCodes();
+            }
+        });
+    </script>
+</body>
+</html>
